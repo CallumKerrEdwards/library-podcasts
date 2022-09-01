@@ -1,8 +1,13 @@
 package service
 
 import (
+	"context"
+
 	"github.com/CallumKerrEdwards/loggerrific"
-	"github.com/jbub/podcasts"
+
+	"github.com/CallumKerrEdwards/library-podcasts/internal/podcasts/config"
+	"github.com/CallumKerrEdwards/library-podcasts/pkg/books"
+	"github.com/CallumKerrEdwards/library-podcasts/pkg/media"
 )
 
 // type BooksClient interface {
@@ -12,26 +17,31 @@ var (
 	defaultRootPath = "/data/feeds"
 )
 
-type EpisodesClient interface {
-	GetAllEpisodes() ([]*podcasts.Item, error)
+type AudiobookClient interface {
+	GetAllAudiobooks(context.Context) ([]books.Book, error)
+}
+
+type MediaClient interface {
+	GetMedia(ctx context.Context, id string) (media.Media, error)
+	GetPath(ctx context.Context, id string) (string, error)
 }
 
 // Service - provides all functions for accessing and modifying Books.
 type Service struct {
-	EpisodesClient EpisodesClient
-	Log            loggerrific.Logger
-	rootPath       string
+	Config          config.Config
+	AudiobookClient AudiobookClient
+	MediaClient     MediaClient
+	Log             loggerrific.Logger
+	rootPath        string
 }
 
-func New(episodesClient EpisodesClient, logger loggerrific.Logger) (*Service, error) {
+func New(config config.Config, audiobooksClient AudiobookClient, mediaClient MediaClient, logger loggerrific.Logger) (*Service, error) {
 	svc := &Service{
-		EpisodesClient: episodesClient,
-		Log:            logger,
-		rootPath:       defaultRootPath,
-	}
-	err := svc.initFeeds()
-	if err != nil {
-		return &Service{}, err
+		Config:          config,
+		AudiobookClient: audiobooksClient,
+		MediaClient:     mediaClient,
+		Log:             logger,
+		rootPath:        defaultRootPath,
 	}
 	return svc, nil
 }

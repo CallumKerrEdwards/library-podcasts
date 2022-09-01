@@ -1,13 +1,15 @@
 package main
 
 import (
+	"net/http"
 	"os"
 
 	"github.com/CallumKerrEdwards/loggerrific"
 
 	"github.com/CallumKerrEdwards/library-podcasts/internal/adapters/logrus"
-
-	"github.com/CallumKerrEdwards/library-podcasts/internal/episodes/dummyclient"
+	booksHTTPClient "github.com/CallumKerrEdwards/library-podcasts/internal/books/httpclient"
+	mediaHTTPClient "github.com/CallumKerrEdwards/library-podcasts/internal/media/httpclient"
+	"github.com/CallumKerrEdwards/library-podcasts/internal/podcasts/config"
 	podcastsService "github.com/CallumKerrEdwards/library-podcasts/internal/podcasts/service"
 	transportHttp "github.com/CallumKerrEdwards/library-podcasts/internal/transport/http"
 )
@@ -16,15 +18,22 @@ import (
 func Run(logger loggerrific.Logger) error {
 	logger.Infoln("Setting up Library Podcasts Server")
 
-	episodesClient := &dummyclient.DummyEpisodesClient{}
+	cfg, err := config.New(logger)
+	if err != nil {
+		logger.WithError(err).Errorln("Config error")
+		return err
+	}
 
-	mainPodcastService, err := podcastsService.New(episodesClient, logger)
+	booksClient := booksHTTPClient.NewBooksClient(cfg.Application.Dependencies.BooksAPIHost, http.DefaultClient, logger)
+	mediaClient := mediaHTTPClient.NewMediaClient(cfg.Application.Dependencies.MediaAPIHost, http.DefaultClient, logger)
+
+	mainPodcastService, err := podcastsService.New(cfg, booksClient, mediaClient, logger)
 	if err != nil {
 		logger.WithError(err).Errorln("service error")
 		return err
 	}
 
-	httpHandler := transportHttp.NewHandler(mainPodcastService, logger)
+	httpHandler := transportHttp.NewHandler(cfg.Server, mainPodcastService, logger)
 	if err = httpHandler.Serve(); err != nil {
 		logger.WithError(err).Errorln("Server error")
 		return err

@@ -8,6 +8,7 @@ import (
 	"os/signal"
 	"time"
 
+	"github.com/CallumKerrEdwards/library-podcasts/internal/podcasts/config"
 	"github.com/CallumKerrEdwards/loggerrific"
 	"github.com/gorilla/mux"
 )
@@ -23,13 +24,15 @@ type FeedService interface {
 type Handler struct {
 	Router  *mux.Router
 	Service FeedService
+	Config  config.Server
 	Server  *http.Server
 	Log     loggerrific.Logger
 }
 
-func NewHandler(service FeedService, logger loggerrific.Logger) *Handler {
+func NewHandler(cfg config.Server, service FeedService, logger loggerrific.Logger) *Handler {
 	h := &Handler{
 		Service: service,
+		Config:  cfg,
 		Log:     logger,
 	}
 	h.Router = mux.NewRouter()
@@ -51,9 +54,8 @@ func (h *Handler) mapRoutes() {
 
 	m := NewMiddlewares(h.Log)
 
-	staticFeedsPath := "/feeds"
-	fs := http.StripPrefix(staticFeedsPath, http.FileServer(http.Dir(h.Service.GetFeedsRoot())))
-	h.Router.PathPrefix(staticFeedsPath).Handler(m.LoggingMiddleware(fs))
+	fs := http.StripPrefix(h.Config.PodcastFeedsPathPrefix, http.FileServer(http.Dir(h.Service.GetFeedsRoot())))
+	h.Router.PathPrefix(h.Config.PodcastFeedsPathPrefix).Handler(m.LoggingMiddleware(fs))
 }
 
 func (h *Handler) Serve() error {
