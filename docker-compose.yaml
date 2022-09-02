@@ -1,0 +1,10 @@
+version: "3.8"
+
+services:
+  cms:
+    build: .
+    image: "ghcr.io/callumkerredwards/library-podcasts:development"
+    environment:
+      OBJECT_STORE_ROOT: "/data"
+    ports:
+    - "8084:8080"
