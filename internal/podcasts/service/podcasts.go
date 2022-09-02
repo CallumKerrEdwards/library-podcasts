@@ -5,9 +5,12 @@ import (
 	"fmt"
 	"os"
 	"path/filepath"
+	"time"
 
 	"github.com/CallumKerrEdwards/podcasts"
 )
+
+const releaseDateLayout = "2006-01-02"
 
 func (s *Service) InitFeeds(ctx context.Context) error {
 
@@ -47,10 +50,18 @@ func (s *Service) InitFeeds(ctx context.Context) error {
 
 		fullAudiobookFileLocation := s.Config.Application.Host + audiobookPath
 
+		datetime, err := time.Parse(releaseDateLayout, audiobook.ReleaseDate)
+		if err != nil {
+			s.Log.WithError(err).Errorln("Cannot get release date for", audiobook.ID)
+			continue
+		}
+
+		datetime.Add(time.Hour * time.Duration(8))
+
 		podcastItem := &podcasts.Item{
 			Title:          audiobook.ID,
 			GUID:           fullAudiobookFileLocation,
-			PubDate:        podcasts.NewPubDate(audiobook.ReleaseDate.Time),
+			PubDate:        podcasts.NewPubDate(datetime),
 			Description:    &podcasts.CDATAText{Value: fmt.Sprintf("%s by %s", audiobook.Title, audiobook.GetAuthor())},
 			ContentEncoded: &podcasts.CDATAText{Value: ""},
 			Enclosure: &podcasts.Enclosure{

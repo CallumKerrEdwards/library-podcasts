@@ -9,7 +9,7 @@ import (
 
 	"github.com/CallumKerrEdwards/loggerrific"
 
-	"github.com/CallumKerrEdwards/library-podcasts/pkg/media"
+	"github.com/CallumKerrEdwards/library-podcasts/internal/adapters/dtos/media"
 )
 
 var (

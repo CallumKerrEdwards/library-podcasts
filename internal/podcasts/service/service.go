@@ -5,9 +5,9 @@ import (
 
 	"github.com/CallumKerrEdwards/loggerrific"
 
+	"github.com/CallumKerrEdwards/library-podcasts/internal/adapters/dtos/books"
+	"github.com/CallumKerrEdwards/library-podcasts/internal/adapters/dtos/media"
 	"github.com/CallumKerrEdwards/library-podcasts/internal/podcasts/config"
-	"github.com/CallumKerrEdwards/library-podcasts/pkg/books"
-	"github.com/CallumKerrEdwards/library-podcasts/pkg/media"
 )
 
 // type BooksClient interface {

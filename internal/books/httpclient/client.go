@@ -7,8 +7,10 @@ import (
 	"fmt"
 	"net/http"
 
-	"github.com/CallumKerrEdwards/library-podcasts/pkg/books"
 	"github.com/CallumKerrEdwards/loggerrific"
+
+	"github.com/CallumKerrEdwards/library-podcasts/internal/adapters/dtos/books"
+	"github.com/CallumKerrEdwards/library-podcasts/internal/adapters/dtos/responses"
 )
 
 var (
@@ -31,9 +33,9 @@ func NewBooksClient(booksAPIHost string, httpClient *http.Client, logger loggerr
 
 func (c *Client) GetAllAudiobooks(ctx context.Context) ([]books.Book, error) {
 
-	responseBodyMap := make(map[string][]books.Book)
+	var responseBody responses.AudiobooksDTO
 
-	request, err := http.NewRequestWithContext(ctx, http.MethodGet, c.BooksAPIHost, nil)
+	request, err := http.NewRequestWithContext(ctx, http.MethodGet, c.BooksAPIHost+"/audiobooks", nil)
 	if err != nil {
 		c.Log.WithError(err).Errorln("Error creating audiobooks request")
 		return []books.Book{}, nil
@@ -43,18 +45,25 @@ func (c *Client) GetAllAudiobooks(ctx context.Context) ([]books.Book, error) {
 	response, err := c.Client.Do(request)
 	if err != nil {
 		c.Log.WithError(err).Errorln("Error getting audiobooks")
-		return []books.Book{}, nil
+		return []books.Book{}, err
 	}
 	defer response.Body.Close()
+
+	// buf := new(strings.Builder)
+	// _, err = io.Copy(buf, response.Body)
+	// // check errors
+	// c.Log.Errorln(buf.String())
 
 	if response.StatusCode != 200 {
 		c.Log.WithField("status_code", response.StatusCode).Errorln("Error getting audiobooks")
 		return []books.Book{}, fmt.Errorf("%w: status code %d", errGettingAudiobooks, response.StatusCode)
 	}
 
-	if err := json.NewDecoder(response.Body).Decode(&responseBodyMap); err != nil {
+	if err := json.NewDecoder(response.Body).Decode(&responseBody); err != nil {
+		c.Log.Errorln(err)
 		c.Log.WithError(err).Errorln("Cannot decode response into audiobooks")
+		return []books.Book{}, err
 	}
 
-	return responseBodyMap["books"], nil
+	return responseBody.Audiobooks, nil
 }

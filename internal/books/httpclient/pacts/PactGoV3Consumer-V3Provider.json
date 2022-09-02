@@ -1,0 +1,242 @@
+{
+  "consumer": {
+    "name": "PactGoV3Consumer"
+  },
+  "interactions": [
+    {
+      "description": "A request for all audiobooks",
+      "providerStates": [
+        {
+          "name": "Some books with audiobook artefacts exist"
+        }
+      ],
+      "request": {
+        "method": "GET",
+        "path": "/audiobooks"
+      },
+      "response": {
+        "body": {
+          "audiobooks": [
+            {
+              "audiobook": {
+                "audiobookMediaId": "44864ec9-77cb-4c76-8d55-c22321a8b51c",
+                "coverImageMediaId": "2d5ba852-87f6-4902-8a3f-49cfa2913352",
+                "narrators": [
+                  {
+                    "forenames": "Brandon",
+                    "sortName": "Sanderson"
+                  }
+                ],
+                "supplimentaryMaterialMediaId": "fc763eba-0905-41c5-a27f-3934ab26786c"
+              },
+              "authors": [
+                {
+                  "forenames": "Brandon",
+                  "sortName": "Sanderson"
+                }
+              ],
+              "description": {
+                "format": "HTML",
+                "text": "<h1>The Final Empire</h1><p>Ash fell from the sky.</p>"
+              },
+              "genres": [
+                "string"
+              ],
+              "id": "fc763eba-0905-41c5-a27f-3934ab26786c",
+              "releaseDate": "2000-01-01",
+              "series": {
+                "sequence": 1,
+                "title": "Mistborn"
+              },
+              "title": "The Final Empire"
+            }
+          ]
+        },
+        "headers": {
+          "Content-Type": "application/json"
+        },
+        "matchingRules": {
+          "body": {
+            "$.audiobooks": {
+              "combine": "AND",
+              "matchers": [
+                {
+                  "match": "type",
+                  "min": 1
+                }
+              ]
+            },
+            "$.audiobooks[*].audiobook.audiobookMediaId": {
+              "combine": "AND",
+              "matchers": [
+                {
+                  "match": "regex",
+                  "regex": "^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$"
+                }
+              ]
+            },
+            "$.audiobooks[*].audiobook.coverImageMediaId": {
+              "combine": "AND",
+              "matchers": [
+                {
+                  "match": "regex",
+                  "regex": "^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$"
+                }
+              ]
+            },
+            "$.audiobooks[*].audiobook.narrators": {
+              "combine": "AND",
+              "matchers": [
+                {
+                  "match": "type",
+                  "min": 1
+                }
+              ]
+            },
+            "$.audiobooks[*].audiobook.narrators[*].forenames": {
+              "combine": "AND",
+              "matchers": [
+                {
+                  "match": "type"
+                }
+              ]
+            },
+            "$.audiobooks[*].audiobook.narrators[*].sortName": {
+              "combine": "AND",
+              "matchers": [
+                {
+                  "match": "type"
+                }
+              ]
+            },
+            "$.audiobooks[*].audiobook.supplimentaryMaterialMediaId": {
+              "combine": "AND",
+              "matchers": [
+                {
+                  "match": "regex",
+                  "regex": "^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$"
+                }
+              ]
+            },
+            "$.audiobooks[*].authors": {
+              "combine": "AND",
+              "matchers": [
+                {
+                  "match": "type",
+                  "min": 1
+                }
+              ]
+            },
+            "$.audiobooks[*].authors[*].forenames": {
+              "combine": "AND",
+              "matchers": [
+                {
+                  "match": "type"
+                }
+              ]
+            },
+            "$.audiobooks[*].authors[*].sortName": {
+              "combine": "AND",
+              "matchers": [
+                {
+                  "match": "type"
+                }
+              ]
+            },
+            "$.audiobooks[*].description.format": {
+              "combine": "AND",
+              "matchers": [
+                {
+                  "match": "regex",
+                  "regex": "^(HTML|Markdown|Plain)$"
+                }
+              ]
+            },
+            "$.audiobooks[*].description.text": {
+              "combine": "AND",
+              "matchers": [
+                {
+                  "match": "type"
+                }
+              ]
+            },
+            "$.audiobooks[*].genres": {
+              "combine": "AND",
+              "matchers": [
+                {
+                  "match": "type",
+                  "min": 1
+                }
+              ]
+            },
+            "$.audiobooks[*].genres[*]": {
+              "combine": "AND",
+              "matchers": [
+                {
+                  "match": "type"
+                }
+              ]
+            },
+            "$.audiobooks[*].id": {
+              "combine": "AND",
+              "matchers": [
+                {
+                  "match": "regex",
+                  "regex": "^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$"
+                }
+              ]
+            },
+            "$.audiobooks[*].releaseDate": {
+              "combine": "AND",
+              "matchers": [
+                {
+                  "match": "regex",
+                  "regex": "^\\d{4}-\\d{2}-\\d{2}$"
+                }
+              ]
+            },
+            "$.audiobooks[*].series.sequence": {
+              "combine": "AND",
+              "matchers": [
+                {
+                  "match": "type"
+                }
+              ]
+            },
+            "$.audiobooks[*].series.title": {
+              "combine": "AND",
+              "matchers": [
+                {
+                  "match": "type"
+                }
+              ]
+            },
+            "$.audiobooks[*].title": {
+              "combine": "AND",
+              "matchers": [
+                {
+                  "match": "type"
+                }
+              ]
+            }
+          },
+          "header": {}
+        },
+        "status": 200
+      }
+    }
+  ],
+  "metadata": {
+    "pactRust": {
+      "ffi": "0.3.8",
+      "mockserver": "0.9.4",
+      "models": "0.4.4"
+    },
+    "pactSpecification": {
+      "version": "3.0.0"
+    }
+  },
+  "provider": {
+    "name": "V3Provider"
+  }
+}
