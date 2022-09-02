@@ -68,7 +68,6 @@ func (s *Service) InitFeeds(ctx context.Context) error {
 		podcasts.Author(s.Config.Podcast.Author),
 		podcasts.Block,
 		podcasts.Explicit,
-		podcasts.Complete,
 		podcasts.Subtitle(s.Config.Podcast.Subtitle),
 		podcasts.Summary(s.Config.Podcast.Description),
 		// podcasts.Image("http://www.example-podcast.com/my-podcast.jpg"),

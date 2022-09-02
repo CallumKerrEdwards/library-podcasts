@@ -43,7 +43,7 @@ func (c *Client) GetAllAudiobooks(ctx context.Context) ([]books.Book, error) {
 	response, err := c.Client.Do(request)
 	if err != nil {
 		c.Log.WithError(err).Errorln("Error getting audiobooks")
-		return []books.Book{}, nil
+		return []books.Book{}, err
 	}
 	defer response.Body.Close()
 
@@ -54,6 +54,7 @@ func (c *Client) GetAllAudiobooks(ctx context.Context) ([]books.Book, error) {
 
 	if err := json.NewDecoder(response.Body).Decode(&responseBodyMap); err != nil {
 		c.Log.WithError(err).Errorln("Cannot decode response into audiobooks")
+		return []books.Book{}, nil
 	}
 
 	return responseBodyMap["audiobooks"], nil
