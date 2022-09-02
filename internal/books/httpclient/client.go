@@ -47,7 +47,7 @@ func (c *Client) GetAllAudiobooks(ctx context.Context) ([]books.Book, error) {
 	}
 	defer response.Body.Close()
 
-	if response.StatusCode != 200 {
+	if response.StatusCode != http.StatusOK {
 		c.Log.WithField("status_code", response.StatusCode).Errorln("Error getting audiobooks")
 		return []books.Book{}, fmt.Errorf("%w: status code %d", errGettingAudiobooks, response.StatusCode)
 	}
