@@ -36,33 +36,29 @@ func (c *Client) GetMedia(ctx context.Context, id string) (media.Media, error) {
 	request, err := http.NewRequestWithContext(ctx, http.MethodGet, fmt.Sprintf("%s/%s", c.MediaAPIHost, id), nil)
 	if err != nil {
 		c.Log.WithError(err).Errorln("Error creating media request")
-		return media.Media{}, nil
+		return media.Media{}, err
 	}
 	request.Header.Set("Accept", "application/json")
 
 	response, err := c.Client.Do(request)
 	if err != nil {
 		c.Log.WithError(err).Errorln("Error getting media")
-		return media.Media{}, nil
+		return media.Media{}, err
 	}
 	defer response.Body.Close()
 
-	if response.StatusCode != 200 {
+	if response.StatusCode != http.StatusOK {
 		c.Log.WithField("status_code", response.StatusCode).Errorln("Error getting media")
 		return media.Media{}, fmt.Errorf("%w: status code %d", err, response.StatusCode)
 	}
 
 	if err := json.NewDecoder(response.Body).Decode(&responseBody); err != nil {
 		c.Log.WithError(err).Errorln("Cannot decode response into media")
+		return media.Media{}, err
 	}
 
 	return responseBody, nil
 }
-
-// type pathResponse struct {
-// 	ID string `json:"id"`
-// 	Path strign
-// }
 
 func (c *Client) GetPath(ctx context.Context, id string) (string, error) {
 	responseBodyMap := make(map[string]string)
@@ -70,24 +66,23 @@ func (c *Client) GetPath(ctx context.Context, id string) (string, error) {
 	request, err := http.NewRequestWithContext(ctx, http.MethodGet, fmt.Sprintf("%s/%s/path", c.MediaAPIHost, id), nil)
 	if err != nil {
 		c.Log.WithError(err).Errorln("Error creating path request")
-		return "", nil
+		return "", err
 	}
 	request.Header.Set("Accept", "application/json")
 
 	response, err := c.Client.Do(request)
 	if err != nil {
 		c.Log.WithError(err).Errorln("Error getting path")
-		return "", nil
+		return "", err
 	}
 	defer response.Body.Close()
 
-	if response.StatusCode != 200 {
+	if response.StatusCode != http.StatusOK {
 		c.Log.WithField("status_code", response.StatusCode).Errorln("Error getting path")
 		return "", fmt.Errorf("%w: status code %d", err, response.StatusCode)
 	}
 
 	if err := json.NewDecoder(response.Body).Decode(&responseBodyMap); err != nil {
-		c.Log.Errorln()
 		c.Log.WithError(err).Errorln("Cannot decode response")
 		return "", err
 	}
