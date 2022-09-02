@@ -33,7 +33,7 @@ func (c *Client) GetAllAudiobooks(ctx context.Context) ([]books.Book, error) {
 
 	responseBodyMap := make(map[string][]books.Book)
 
-	request, err := http.NewRequestWithContext(ctx, http.MethodGet, c.BooksAPIHost, nil)
+	request, err := http.NewRequestWithContext(ctx, http.MethodGet, c.BooksAPIHost+"/audiobooks", nil)
 	if err != nil {
 		c.Log.WithError(err).Errorln("Error creating audiobooks request")
 		return []books.Book{}, nil
@@ -56,5 +56,5 @@ func (c *Client) GetAllAudiobooks(ctx context.Context) ([]books.Book, error) {
 		c.Log.WithError(err).Errorln("Cannot decode response into audiobooks")
 	}
 
-	return responseBodyMap["books"], nil
+	return responseBodyMap["audiobooks"], nil
 }

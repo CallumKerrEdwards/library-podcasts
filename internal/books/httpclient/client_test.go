@@ -13,7 +13,7 @@ import (
 const (
 	audiobooksResponse = `
 	{
-		"books": [
+		"audiobooks": [
 		  {
 			"id": "b05b79e2-17ff-4896-848d-a5a6a5e78066",
 			"title": "The Final Empire",
@@ -91,13 +91,13 @@ const (
 func TestBooksClient(t *testing.T) {
 
 	server := httptest.NewServer(http.HandlerFunc(func(rw http.ResponseWriter, req *http.Request) {
-		assert.Equal(t, req.URL.String(), "/")
+		assert.Equal(t, req.URL.String(), "/audiobooks")
 		rw.Write([]byte(audiobooksResponse))
 		rw.Header().Add("Content-Type", "application/json")
 	}))
 	defer server.Close()
 
-	testClient := NewBooksClient(server.URL+"/", server.Client(), tlogger.NewTLogger(t))
+	testClient := NewBooksClient(server.URL, server.Client(), tlogger.NewTLogger(t))
 
 	allAudiobooks, err := testClient.GetAllAudiobooks(context.Background())
 	assert.Nil(t, err)
