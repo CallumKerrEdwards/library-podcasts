@@ -30,10 +30,14 @@ func NewMediaClient(MediaAPIHost string, httpClient *http.Client, logger loggerr
 	}
 }
 
+func (c *Client) getMediaPath() string {
+	return fmt.Sprintf("%s/cms/v1/media", c.MediaAPIHost)
+}
+
 func (c *Client) GetMedia(ctx context.Context, id string) (media.Media, error) {
 	var responseBody media.Media
 
-	request, err := http.NewRequestWithContext(ctx, http.MethodGet, fmt.Sprintf("%s/%s", c.MediaAPIHost, id), nil)
+	request, err := http.NewRequestWithContext(ctx, http.MethodGet, fmt.Sprintf("%s/%s", c.getMediaPath(), id), nil)
 	if err != nil {
 		c.Log.WithError(err).Errorln("Error creating media request")
 		return media.Media{}, err
@@ -49,7 +53,7 @@ func (c *Client) GetMedia(ctx context.Context, id string) (media.Media, error) {
 
 	if response.StatusCode != http.StatusOK {
 		c.Log.WithField("status_code", response.StatusCode).Errorln("Error getting media")
-		return media.Media{}, fmt.Errorf("%w: status code %d", err, response.StatusCode)
+		return media.Media{}, fmt.Errorf("%w: status code %d", errGettingMedia, response.StatusCode)
 	}
 
 	if err := json.NewDecoder(response.Body).Decode(&responseBody); err != nil {
@@ -60,10 +64,13 @@ func (c *Client) GetMedia(ctx context.Context, id string) (media.Media, error) {
 	return responseBody, nil
 }
 
-func (c *Client) GetPath(ctx context.Context, id string) (string, error) {
-	responseBodyMap := make(map[string]string)
+type pathResponse struct {
+	Path string `json:"path" pact:"example=/media/audio/9136ee1d-f0ba-428e-9092-ad64f3ab98863-Pride%20and%20Prejudice.m4b"`
+}
 
-	request, err := http.NewRequestWithContext(ctx, http.MethodGet, fmt.Sprintf("%s/%s/path", c.MediaAPIHost, id), nil)
+func (c *Client) GetPath(ctx context.Context, id string) (string, error) {
+
+	request, err := http.NewRequestWithContext(ctx, http.MethodGet, fmt.Sprintf("%s/%s/path", c.getMediaPath(), id), nil)
 	if err != nil {
 		c.Log.WithError(err).Errorln("Error creating path request")
 		return "", err
@@ -79,13 +86,14 @@ func (c *Client) GetPath(ctx context.Context, id string) (string, error) {
 
 	if response.StatusCode != http.StatusOK {
 		c.Log.WithField("status_code", response.StatusCode).Errorln("Error getting path")
-		return "", fmt.Errorf("%w: status code %d", err, response.StatusCode)
+		return "", fmt.Errorf("%w: status code %d", errGettingMedia, response.StatusCode)
 	}
 
-	if err := json.NewDecoder(response.Body).Decode(&responseBodyMap); err != nil {
+	var responseBody pathResponse
+	if err := json.NewDecoder(response.Body).Decode(&responseBody); err != nil {
 		c.Log.WithError(err).Errorln("Cannot decode response")
 		return "", err
 	}
 
-	return responseBodyMap["path"], nil
+	return responseBody.Path, nil
 }
