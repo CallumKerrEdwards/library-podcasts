@@ -1,0 +1,22 @@
+name: Test
+on:
+  push:
+    branches-ignore:
+      - main
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    name: Run Tests
+    steps:
+      - uses: actions/checkout@v3
+      - name: Set up Go
+        uses: actions/setup-go@v3
+        with:
+          go-version: 1.19
+      - name: Set up Pact-Go
+        run: |
+          go install github.com/pact-foundation/pact-go/v2@2.x.x
+          pact-go -l DEBUG install
+      - name: Test
+        run: go test -tags=contract -v ./...
